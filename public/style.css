@@ -1,0 +1,152 @@
+/* ===== GLOBAL ===== */
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0d0d2b, #1a0033);
+    color: white;
+}
+
+/* ===== NAVBAR ===== */
+
+.navbar {
+    background: rgba(0,0,0,0.6) !important;
+    backdrop-filter: blur(12px);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.nav-link {
+    color: #ccc !important;
+}
+
+.nav-link:hover {
+    color: white !important;
+}
+
+/* ===== HERO ===== */
+
+.hero {
+    padding: 120px 20px;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 58px;
+    font-weight: 800;
+}
+
+.gradient-text {
+    background: linear-gradient(90deg, #a855f7, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+    color: #cbd5e1;
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+/* ===== BUTTONS ===== */
+
+.btn-primary {
+    background: linear-gradient(90deg, #a855f7, #22d3ee);
+    border: none;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-danger {
+    background: #ff4d6d;
+    border: none;
+}
+
+.btn-success {
+    background: #00c897;
+    border: none;
+}
+
+/* ===== GLASS CARD ===== */
+
+.glass-card {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(15px);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* ===== DASHBOARD CARDS ===== */
+
+.dashboard-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 20px;
+}
+
+/* ===== FORM ===== */
+
+.form-control, .form-select {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+}
+
+.form-control::placeholder {
+    color: #ccc;
+}
+
+/* ===== BADGE ===== */
+
+.badge {
+    padding: 8px 14px;
+    font-weight: 600;
+}
+
+/* ===== FOOTER ===== */
+
+footer {
+    text-align: center;
+    padding: 30px;
+    margin-top: 80px;
+    background: rgba(0,0,0,0.5);
+}
+
+/* ===== FIX SELECT DROPDOWN ===== */
+
+select {
+    background-color: rgba(255,255,255,0.1) !important;
+    color: white !important;
+}
+
+select option {
+    background-color: #1a0033;
+    color: white;
+}select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #22d3ee;
+}
+
+.item-card {
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.item-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 0 25px rgba(34, 211, 238, 0.3);
+}
+
+#itemsGrid {
+    align-items: stretch;
+}
+
