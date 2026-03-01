@@ -21,16 +21,15 @@ app.use(session({
 
 /* ================= DATABASE ================= */
 
-const db = mysql.createConnection(process.env.DATABASE_URL)
+const db = mysql.createConnection(process.env.DATABASE_URL);
 
-db.connect(err => {
+db.connect((err) => {
     if (err) {
-        console.error("Database connection failed:", err)
-        process.exit(1)
+        console.error("Database connection failed:", err);
+        process.exit(1);
     }
-    console.log("MySQL Connected")
-})
-
+    console.log("MySQL Connected");
+});
 /* ================= HELPERS ================= */
 
 function requireLogin(req, res, next) {
