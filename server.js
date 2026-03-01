@@ -2,6 +2,7 @@ const express = require("express")
 const mysql = require("mysql2")
 const bcrypt = require("bcrypt")
 const session = require("express-session")
+require("dotenv").config()
 
 const app = express()
 
@@ -12,7 +13,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.static("public"))
 
 app.use(session({
-    secret: "superSecretKey",
+    secret: process.env.SESSION_SECRET || "superSecretKey",
     resave: false,
     saveUninitialized: false,
     cookie: { httpOnly: true }
@@ -21,10 +22,11 @@ app.use(session({
 /* ================= DATABASE ================= */
 
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "lostfound_db"
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT
 })
 
 db.connect(err => {
@@ -47,7 +49,6 @@ function validateFields(fields) {
     return fields.every(field => field && field.trim() !== "")
 }
 
-// QIU Email Regex
 const qiuEmailRegex = /^[a-zA-Z0-9._%+-]+@qiu\.edu\.my$/
 
 /* ================= AUTH ================= */
@@ -144,7 +145,6 @@ app.get("/check-login", (req, res) => {
 
 /* ================= ITEMS ================= */
 
-// View all
 app.get("/items", (req, res, next) => {
     db.query("SELECT * FROM items", (err, result) => {
 
@@ -159,7 +159,6 @@ app.get("/items", (req, res, next) => {
     })
 })
 
-// Add item
 app.post("/items", requireLogin, (req, res, next) => {
 
     const { category, type, title, description, location, date, contact } = req.body
@@ -179,7 +178,6 @@ app.post("/items", requireLogin, (req, res, next) => {
     )
 })
 
-// Claim item
 app.put("/items/:id", requireLogin, (req, res, next) => {
 
     db.query(
@@ -197,7 +195,6 @@ app.put("/items/:id", requireLogin, (req, res, next) => {
     )
 })
 
-// Edit item
 app.put("/items/edit/:id", requireLogin, (req, res, next) => {
 
     const { category, type, title, description, location, date, contact } = req.body
@@ -232,7 +229,6 @@ app.put("/items/edit/:id", requireLogin, (req, res, next) => {
     )
 })
 
-// Delete item
 app.delete("/items/:id", requireLogin, (req, res, next) => {
 
     db.query(
@@ -256,7 +252,6 @@ app.get("/", (req, res) => {
 
 /* ================= ERROR HANDLING ================= */
 
-// 404
 app.use((req, res) => {
     res.status(404).json({
         success: false,
@@ -264,7 +259,6 @@ app.use((req, res) => {
     })
 })
 
-// 500
 app.use((err, req, res, next) => {
     console.error("Server Error:", err.stack)
     res.status(500).json({
