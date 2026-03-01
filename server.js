@@ -5,6 +5,8 @@ const session = require("express-session")
 
 const app = express()
 
+/* ================= MIDDLEWARE ================= */
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static("public"))
@@ -33,7 +35,7 @@ db.connect(err => {
     console.log("MySQL Connected")
 })
 
-/* ================= HELPER ================= */
+/* ================= HELPERS ================= */
 
 function requireLogin(req, res, next) {
     if (!req.session.userId)
@@ -45,6 +47,9 @@ function validateFields(fields) {
     return fields.every(field => field && field.trim() !== "")
 }
 
+// QIU Email Regex
+const qiuEmailRegex = /^[a-zA-Z0-9._%+-]+@qiu\.edu\.my$/
+
 /* ================= AUTH ================= */
 
 // Signup
@@ -55,6 +60,16 @@ app.post("/signup", async (req, res, next) => {
         if (!validateFields([username, password]))
             return res.status(400).json({ message: "All fields required" })
 
+        if (!qiuEmailRegex.test(username))
+            return res.status(400).json({
+                message: "Only QIU email allowed (example: raymond@qiu.edu.my)"
+            })
+
+        if (password.length < 6)
+            return res.status(400).json({
+                message: "Password must be at least 6 characters"
+            })
+
         const hashed = await bcrypt.hash(password, 10)
 
         db.query(
@@ -62,11 +77,14 @@ app.post("/signup", async (req, res, next) => {
             [username, hashed],
             (err) => {
                 if (err)
-                    return res.status(400).json({ message: "User exists" })
+                    return res.status(400).json({
+                        message: "Email already registered"
+                    })
 
                 res.json({ message: "Signup success" })
             }
         )
+
     } catch (err) {
         next(err)
     }
@@ -78,6 +96,11 @@ app.post("/login", (req, res, next) => {
 
     if (!validateFields([username, password]))
         return res.status(400).json({ message: "All fields required" })
+
+    if (!qiuEmailRegex.test(username))
+        return res.status(401).json({
+            message: "Invalid email domain"
+        })
 
     db.query(
         "SELECT * FROM users WHERE username=?",
@@ -105,8 +128,9 @@ app.post("/login", (req, res, next) => {
 
 // Logout
 app.get("/logout", (req, res) => {
-    req.session.destroy()
-    res.json({ message: "Logged out" })
+    req.session.destroy(() => {
+        res.json({ message: "Logged out" })
+    })
 })
 
 // Check login
@@ -240,10 +264,9 @@ app.use((req, res) => {
     })
 })
 
-// 500 Global Error Handler
+// 500
 app.use((err, req, res, next) => {
     console.error("Server Error:", err.stack)
-
     res.status(500).json({
         success: false,
         message: "Internal Server Error"
@@ -252,6 +275,8 @@ app.use((err, req, res, next) => {
 
 /* ================= SERVER ================= */
 
-app.listen(3000, () =>
-    console.log("Server running on http://localhost:3000")
+const PORT = process.env.PORT || 3000
+
+app.listen(PORT, () =>
+    console.log("Server running on port", PORT)
 )

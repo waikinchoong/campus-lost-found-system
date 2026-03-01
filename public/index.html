@@ -9,8 +9,17 @@
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark px-4">
-    <a class="navbar-brand" href="home.html">Lost&Found</a>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
+
+    <!-- Logo + System Name -->
+    <a class="navbar-brand d-flex align-items-center" href="home.html">
+        <img src="/images/qiu-logo.png.png"
+             alt="QIU Logo"
+             height="40"
+             class="me-2">
+        <span>Campus Lost & Found</span>
+    </a>
 
     <div class="collapse navbar-collapse">
         <ul class="navbar-nav me-auto ms-4">
@@ -23,10 +32,16 @@
             <li class="nav-item">
                 <a class="nav-link" href="add.html">Report Item</a>
             </li>
+
+        <li class="nav-item">
+        <a class="nav-link active" href="about.html">About</a>
+      </li>
         </ul>
 
         <div id="authButtons"></div>
     </div>
+
+
 </nav>
 
 <div class="container mt-5">
@@ -79,9 +94,10 @@
         </div>
 
         <div class="col-md-3">
-            <input type="text" id="searchInput"
-                class="form-control"
-                placeholder="Search title...">
+            <input type="text"
+                   id="searchInput"
+                   class="form-control"
+                   placeholder="Search title...">
         </div>
     </div>
 
@@ -90,7 +106,7 @@
 
 </div>
 
-<footer>
+<footer class="text-center py-3 bg-dark text-white mt-5">
     © 2026 Campus Lost & Found System
 </footer>
 

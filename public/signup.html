@@ -9,38 +9,53 @@
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark px-4">
-    <a class="navbar-brand" href="home.html">Lost&Found</a>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
+    <a class="navbar-brand d-flex align-items-center" href="home.html">
+        <img src="/images/qiu-logo.png.png"
+             alt="QIU Logo"
+             height="40"
+             class="me-2">
+        <span>Campus Lost & Found</span>
+    </a>
 </nav>
 
 <div class="container d-flex justify-content-center align-items-center" style="min-height:80vh;">
 
-    <div class="glass-card" style="width:400px;">
+    <div class="glass-card p-4" style="width:400px;">
 
         <h3 class="text-center mb-4">Create Account</h3>
 
         <form id="signupForm">
 
             <div class="mb-3">
-                <input id="username" class="form-control"
-                    placeholder="Username" required>
+              <input id="username"
+       type="email"
+       class="form-control"
+       placeholder="Email (@qiu.edu.my only)"
+       required
+       pattern="^[a-zA-Z0-9._%+-]+@qiu\.edu\.my$">
             </div>
 
             <div class="mb-3">
-                <input type="password" id="password"
-                    class="form-control"
-                    placeholder="Password" required>
+                <input type="password"
+                       id="password"
+                       class="form-control"
+                       placeholder="Password" required>
             </div>
 
             <button type="submit"
-                class="btn btn-primary w-100">
+                    class="btn btn-primary w-100">
                 Signup
             </button>
+
         </form>
 
         <p class="text-center mt-3">
             Already have account?
-            <a href="login.html" style="color:#22d3ee;">Login here</a>
+            <a href="login.html" style="color:#22d3ee;">
+                Login here
+            </a>
         </p>
 
     </div>
