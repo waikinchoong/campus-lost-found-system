@@ -10,9 +10,10 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.static("public"))
 
 app.use(session({
-    secret: "secretKey",
+    secret: "superSecretKey",
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: { httpOnly: true }
 }))
 
 /* ================= DATABASE ================= */
@@ -32,12 +33,27 @@ db.connect(err => {
     console.log("MySQL Connected")
 })
 
+/* ================= HELPER ================= */
+
+function requireLogin(req, res, next) {
+    if (!req.session.userId)
+        return res.status(401).json({ message: "Login required" })
+    next()
+}
+
+function validateFields(fields) {
+    return fields.every(field => field && field.trim() !== "")
+}
+
 /* ================= AUTH ================= */
 
 // Signup
 app.post("/signup", async (req, res, next) => {
     try {
         const { username, password } = req.body
+
+        if (!validateFields([username, password]))
+            return res.status(400).json({ message: "All fields required" })
 
         const hashed = await bcrypt.hash(password, 10)
 
@@ -59,6 +75,9 @@ app.post("/signup", async (req, res, next) => {
 // Login
 app.post("/login", (req, res, next) => {
     const { username, password } = req.body
+
+    if (!validateFields([username, password]))
+        return res.status(400).json({ message: "All fields required" })
 
     db.query(
         "SELECT * FROM users WHERE username=?",
@@ -99,17 +118,12 @@ app.get("/check-login", (req, res) => {
     })
 })
 
-function requireLogin(req, res, next) {
-    if (!req.session.userId)
-        return res.status(401).json({ message: "Login required" })
-    next()
-}
-
 /* ================= ITEMS ================= */
 
-// View
+// View all
 app.get("/items", (req, res, next) => {
     db.query("SELECT * FROM items", (err, result) => {
+
         if (err) return next(err)
 
         const items = result.map(item => ({
@@ -121,13 +135,19 @@ app.get("/items", (req, res, next) => {
     })
 })
 
-// Add
+// Add item
 app.post("/items", requireLogin, (req, res, next) => {
+
     const { category, type, title, description, location, date, contact } = req.body
 
+    if (!validateFields([category, type, title, description, location, date, contact]))
+        return res.status(400).json({ message: "All fields required" })
+
     db.query(
-        "INSERT INTO items (category,type,title,description,location,date,contact,status,user_id) VALUES (?,?,?,?,?,?,?, 'Active',?)",
-        [category,type,title,description,location,date,contact,req.session.userId],
+        `INSERT INTO items 
+        (category,type,title,description,location,date,contact,status,user_id) 
+        VALUES (?,?,?,?,?,?,?, 'Active',?)`,
+        [category, type, title, description, location, date, contact, req.session.userId],
         (err) => {
             if (err) return next(err)
             res.json({ message: "Item added" })
@@ -135,8 +155,9 @@ app.post("/items", requireLogin, (req, res, next) => {
     )
 })
 
-// Claim
+// Claim item
 app.put("/items/:id", requireLogin, (req, res, next) => {
+
     db.query(
         "UPDATE items SET status='Claimed' WHERE id=? AND user_id=?",
         [req.params.id, req.session.userId],
@@ -152,9 +173,13 @@ app.put("/items/:id", requireLogin, (req, res, next) => {
     )
 })
 
-// Edit
+// Edit item
 app.put("/items/edit/:id", requireLogin, (req, res, next) => {
+
     const { category, type, title, description, location, date, contact } = req.body
+
+    if (!validateFields([category, type, title, description, location, date, contact]))
+        return res.status(400).json({ message: "All fields required" })
 
     db.query(
         `UPDATE items 
@@ -183,8 +208,9 @@ app.put("/items/edit/:id", requireLogin, (req, res, next) => {
     )
 })
 
-// Delete
+// Delete item
 app.delete("/items/:id", requireLogin, (req, res, next) => {
+
     db.query(
         "DELETE FROM items WHERE id=? AND user_id=?",
         [req.params.id, req.session.userId],
@@ -200,13 +226,13 @@ app.delete("/items/:id", requireLogin, (req, res, next) => {
     )
 })
 
-app.get("/", (req,res)=>{
+app.get("/", (req, res) => {
     res.redirect("/home.html")
 })
 
 /* ================= ERROR HANDLING ================= */
 
-// 404 handler
+// 404
 app.use((req, res) => {
     res.status(404).json({
         success: false,
@@ -214,7 +240,7 @@ app.use((req, res) => {
     })
 })
 
-// Global error handler (500)
+// 500 Global Error Handler
 app.use((err, req, res, next) => {
     console.error("Server Error:", err.stack)
 
