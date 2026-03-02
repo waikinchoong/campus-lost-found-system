@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Lost & Found Portal</title>
+    <title>Campus Lost & Found</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 </head>
 
 <body>
@@ -22,7 +21,6 @@
         <span>Campus Lost & Found</span>
     </a>
 
-    <!-- Menu -->
     <div class="collapse navbar-collapse">
         <ul class="navbar-nav me-auto ms-4">
             <li class="nav-item">
@@ -43,66 +41,76 @@
         <div id="authButtons"></div>
     </div>
 
+
 </nav>
 
-<!-- HERO SECTION -->
-<section class="hero text-center text-white position-relative">
+<div class="container mt-5">
 
-    <!-- Particles Background -->
-    <div id="particles-js"
-         style="position:absolute;width:100%;height:100%;z-index:-1;"></div>
+    <h1 class="text-center mb-2">Campus Lost & Found</h1>
+    <p class="text-center mb-5">
+        Helping Students Reconnect With Their Lost Items
+    </p>
 
-    <div class="container py-5">
-
-        <h1 data-aos="fade-down">
-            Lost Something?<br>
-            <span class="gradient-text">We’ll Help You Find It</span>
-        </h1>
-
-        <p class="mt-3" data-aos="fade-up">
-            A centralized platform for students to report and recover lost items.
-        </p>
-
-        <div class="mt-4" data-aos="zoom-in">
-            <a href="add.html" class="btn btn-danger me-3">
-                Report Lost Item
-            </a>
-            <a href="add.html" class="btn btn-success">
-                Report Found Item
-            </a>
+    <!-- Dashboard -->
+    <div class="row text-center mb-5">
+        <div class="col-md-3">
+            <div class="dashboard-card">
+                <h5>Total</h5>
+                <h3 id="totalItems">0</h3>
+            </div>
         </div>
 
+        <div class="col-md-3">
+            <div class="dashboard-card">
+                <h5>Lost</h5>
+                <h3 id="totalLost" class="text-danger">0</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="dashboard-card">
+                <h5>Found</h5>
+                <h3 id="totalFound" class="text-info">0</h3>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="dashboard-card">
+                <h5>Claimed</h5>
+                <h3 id="totalClaimed" class="text-success">0</h3>
+            </div>
+        </div>
     </div>
 
-</section>
+    <!-- Filter -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <select id="filterStatus" class="form-select">
+                <option value="All">Show All</option>
+                <option value="Lost">Lost</option>
+                <option value="Found">Found</option>
+                <option value="Claimed">Claimed</option>
+            </select>
+        </div>
 
-<footer class="text-center text-white py-3 bg-dark">
-    © 2026 Campus Lost & Found
+        <div class="col-md-3">
+            <input type="text"
+                   id="searchInput"
+                   class="form-control"
+                   placeholder="Search title...">
+        </div>
+    </div>
+
+    <!-- Items -->
+    <div id="items"></div>
+
+</div>
+
+<footer class="text-center py-3 bg-dark text-white mt-5">
+    © 2026 Campus Lost & Found System
 </footer>
 
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script src="script.js"></script>
-
-<script>
-particlesJS("particles-js", {
-  particles: {
-    number: { value: 60 },
-    size: { value: 3 },
-    color: { value: "#a855f7" },
-    line_linked: {
-      enable: true,
-      distance: 150,
-      color: "#22d3ee",
-      opacity: 0.4
-    },
-    move: { enable: true, speed: 2 }
-  }
-});
-
-AOS.init({ duration: 1000, once: true });
-</script>
 
 </body>
 </html>
