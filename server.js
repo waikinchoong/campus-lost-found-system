@@ -23,6 +23,8 @@ app.use(session({
 
 const db = mysql.createConnection(process.env.DATABASE_URL);
 
+
+
 db.connect((err) => {
     if (err) {
         console.error("Database connection failed:", err);
@@ -31,6 +33,11 @@ db.connect((err) => {
 
     console.log("MySQL Connected");
 
+    // 强制打印当前数据库
+    db.query("SELECT DATABASE() AS db", (err, result) => {
+        console.log("Current Database:", result);
+    });
+
     // 创建 users 表
     db.query(`
         CREATE TABLE IF NOT EXISTS users (
@@ -38,7 +45,10 @@ db.connect((err) => {
             username VARCHAR(255) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL
         )
-    `);
+    `, (err) => {
+        if (err) console.error("Create users table error:", err);
+        else console.log("Users table ready");
+    });
 
     // 创建 items 表
     db.query(`
@@ -54,7 +64,10 @@ db.connect((err) => {
             status VARCHAR(50),
             user_id INT
         )
-    `);
+    `, (err) => {
+        if (err) console.error("Create items table error:", err);
+        else console.log("Items table ready");
+    });
 });
 /* ================= HELPERS ================= */
 
