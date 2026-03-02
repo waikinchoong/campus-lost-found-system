@@ -150,3 +150,99 @@ select option {
     align-items: stretch;
 }
 
+/* ================= NAVBAR ================= */
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: #0b0b1f;
+    color: white;
+    flex-wrap: wrap;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo {
+    height: 40px;
+}
+
+.brand {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.nav-center {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-center a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.add-btn {
+    background: #4c6ef5;
+    border: none;
+    padding: 8px 14px;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.logout-btn {
+    background: transparent;
+    border: 1px solid red;
+    color: red;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.welcome-text {
+    font-size: 14px;
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 768px) {
+
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .nav-center {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .nav-right {
+        flex-wrap: wrap;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .nav-right button {
+        flex: 1;
+    }
+
+    .welcome-text {
+        width: 100%;
+        font-size: 13px;
+    }
+}
