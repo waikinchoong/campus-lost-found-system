@@ -14,13 +14,25 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-4">
 
     <!-- Logo + System Name -->
-    <a class="navbar-brand d-flex align-items-center" href="home.html">
-        <img src="/images/qiu-logo.png.png"
-             alt="QIU Logo"
-             height="40"
-             class="me-2">
-        <span>Campus Lost & Found</span>
-    </a>
+    <nav class="navbar">
+    <div class="nav-left">
+        <img src="images/qiu-logo.png" class="logo">
+        <span class="brand">Campus Lost & Found</span>
+    </div>
+
+    <div class="nav-center">
+        <a href="home.html">Home</a>
+        <a href="browse.html">Browse Items</a>
+        <a href="add.html">Report Item</a>
+        <a href="about.html">About</a>
+    </div>
+
+    <div class="nav-right">
+        <button class="add-btn">Add Item</button>
+        <span class="welcome-text">Welcome, raymond@qiu.edu.my</span>
+        <button class="logout-btn">Logout</button>
+    </div>
+</nav>
 
     <!-- Menu -->
     <div class="collapse navbar-collapse">
