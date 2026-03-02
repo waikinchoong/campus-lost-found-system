@@ -28,7 +28,33 @@ db.connect((err) => {
         console.error("Database connection failed:", err);
         process.exit(1);
     }
+
     console.log("MySQL Connected");
+
+    // 创建 users 表
+    db.query(`
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(255) UNIQUE NOT NULL,
+            password VARCHAR(255) NOT NULL
+        )
+    `);
+
+    // 创建 items 表
+    db.query(`
+        CREATE TABLE IF NOT EXISTS items (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            category VARCHAR(100),
+            type VARCHAR(50),
+            title VARCHAR(255),
+            description TEXT,
+            location VARCHAR(255),
+            date VARCHAR(100),
+            contact VARCHAR(255),
+            status VARCHAR(50),
+            user_id INT
+        )
+    `);
 });
 /* ================= HELPERS ================= */
 
