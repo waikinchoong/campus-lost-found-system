@@ -2,11 +2,14 @@ const express = require("express")
 const mysql = require("mysql2")
 const bcrypt = require("bcrypt")
 const session = require("express-session")
+const helmet = require("helmet")
 require("dotenv").config()
 
 const app = express()
 
-/* ================= MIDDLEWARE ================= */
+/* ================= SECURITY MIDDLEWARE ================= */
+
+app.use(helmet())
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -16,41 +19,31 @@ app.use(session({
     secret: process.env.SESSION_SECRET || "superSecretKey",
     resave: false,
     saveUninitialized: false,
-    cookie: { httpOnly: true }
+    cookie: {
+        httpOnly: true
+    }
 }))
 
 /* ================= DATABASE ================= */
 
-const db = mysql.createConnection(process.env.DATABASE_URL);
+const db = mysql.createConnection(process.env.DATABASE_URL)
 
-
-
-db.connect((err) => {
+db.connect(err => {
     if (err) {
-        console.error("Database connection failed:", err);
-        process.exit(1);
+        console.error("Database connection failed:", err)
+        process.exit(1)
     }
 
-    console.log("MySQL Connected");
+    console.log("MySQL Connected")
 
-    // 强制打印当前数据库
-    db.query("SELECT DATABASE() AS db", (err, result) => {
-        console.log("Current Database:", result);
-    });
-
-    // 创建 users 表
     db.query(`
         CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
             username VARCHAR(255) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL
         )
-    `, (err) => {
-        if (err) console.error("Create users table error:", err);
-        else console.log("Users table ready");
-    });
+    `)
 
-    // 创建 items 表
     db.query(`
         CREATE TABLE IF NOT EXISTS items (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -64,11 +57,9 @@ db.connect((err) => {
             status VARCHAR(50),
             user_id INT
         )
-    `, (err) => {
-        if (err) console.error("Create items table error:", err);
-        else console.log("Items table ready");
-    });
-});
+    `)
+})
+
 /* ================= HELPERS ================= */
 
 function requireLogin(req, res, next) {
@@ -78,54 +69,61 @@ function requireLogin(req, res, next) {
 }
 
 function validateFields(fields) {
-    return fields.every(field => field && field.trim() !== "")
+    return fields.every(f => f && f.trim() !== "")
 }
 
 const qiuEmailRegex = /^[a-zA-Z0-9._%+-]+@qiu\.edu\.my$/
 
+/* ===== XSS SANITIZE ===== */
+
+function sanitizeInput(str) {
+    if (!str) return ""
+    return str.replace(/<[^>]*>?/gm, "")
+}
+
 /* ================= AUTH ================= */
 
-// Signup
-app.post("/signup", async (req, res, next) => {
-    try {
-        const { username, password } = req.body
+app.post("/signup", async (req, res) => {
 
-        if (!validateFields([username, password]))
-            return res.status(400).json({ message: "All fields required" })
+    let { username, password } = req.body
 
-        if (!qiuEmailRegex.test(username))
-            return res.status(400).json({
-                message: "Only QIU email allowed (example: raymond@qiu.edu.my)"
-            })
+    username = sanitizeInput(username)
 
-        if (password.length < 6)
-            return res.status(400).json({
-                message: "Password must be at least 6 characters"
-            })
+    if (!validateFields([username, password]))
+        return res.status(400).json({ message: "All fields required" })
 
-        const hashed = await bcrypt.hash(password, 10)
+    if (!qiuEmailRegex.test(username))
+        return res.status(400).json({
+            message: "Only QIU email allowed"
+        })
 
-        db.query(
-            "INSERT INTO users (username,password) VALUES (?,?)",
-            [username, hashed],
-            (err) => {
-                if (err)
-                    return res.status(400).json({
-                        message: "Email already registered"
-                    })
+    if (password.length < 6)
+        return res.status(400).json({
+            message: "Password must be at least 6 characters"
+        })
 
-                res.json({ message: "Signup success" })
-            }
-        )
+    const hashed = await bcrypt.hash(password, 10)
 
-    } catch (err) {
-        next(err)
-    }
+    db.query(
+        "INSERT INTO users (username,password) VALUES (?,?)",
+        [username, hashed],
+        err => {
+
+            if (err)
+                return res.status(400).json({
+                    message: "Email already registered"
+                })
+
+            res.json({ message: "Signup success" })
+        }
+    )
 })
 
-// Login
-app.post("/login", (req, res, next) => {
-    const { username, password } = req.body
+app.post("/login", (req, res) => {
+
+    let { username, password } = req.body
+
+    username = sanitizeInput(username)
 
     if (!validateFields([username, password]))
         return res.status(400).json({ message: "All fields required" })
@@ -140,12 +138,11 @@ app.post("/login", (req, res, next) => {
         [username],
         async (err, result) => {
 
-            if (err) return next(err)
-
             if (result.length === 0)
                 return res.status(401).json({ message: "Invalid login" })
 
             const user = result[0]
+
             const match = await bcrypt.compare(password, user.password)
 
             if (!match)
@@ -159,14 +156,12 @@ app.post("/login", (req, res, next) => {
     )
 })
 
-// Logout
 app.get("/logout", (req, res) => {
     req.session.destroy(() => {
         res.json({ message: "Logged out" })
     })
 })
 
-// Check login
 app.get("/check-login", (req, res) => {
     res.json({
         loggedIn: !!req.session.userId,
@@ -177,10 +172,9 @@ app.get("/check-login", (req, res) => {
 
 /* ================= ITEMS ================= */
 
-app.get("/items", (req, res, next) => {
-    db.query("SELECT * FROM items", (err, result) => {
+app.get("/items", (req, res) => {
 
-        if (err) return next(err)
+    db.query("SELECT * FROM items", (err, result) => {
 
         const items = result.map(item => ({
             ...item,
@@ -191,45 +185,56 @@ app.get("/items", (req, res, next) => {
     })
 })
 
-app.post("/items", requireLogin, (req, res, next) => {
+app.post("/items", requireLogin, (req, res) => {
 
-    const { category, type, title, description, location, date, contact } = req.body
+    let { category, type, title, description, location, date, contact } = req.body
+
+    category = sanitizeInput(category)
+    type = sanitizeInput(type)
+    title = sanitizeInput(title)
+    description = sanitizeInput(description)
+    location = sanitizeInput(location)
+    contact = sanitizeInput(contact)
 
     if (!validateFields([category, type, title, description, location, date, contact]))
         return res.status(400).json({ message: "All fields required" })
 
     db.query(
         `INSERT INTO items 
-        (category,type,title,description,location,date,contact,status,user_id) 
+        (category,type,title,description,location,date,contact,status,user_id)
         VALUES (?,?,?,?,?,?,?, 'Active',?)`,
         [category, type, title, description, location, date, contact, req.session.userId],
-        (err) => {
-            if (err) return next(err)
+        () => {
             res.json({ message: "Item added" })
         }
     )
 })
 
-app.put("/items/:id", requireLogin, (req, res, next) => {
+app.put("/items/:id", requireLogin, (req, res) => {
 
     db.query(
         "UPDATE items SET status='Claimed' WHERE id=? AND user_id=?",
         [req.params.id, req.session.userId],
         (err, result) => {
 
-            if (err) return next(err)
-
             if (result.affectedRows === 0)
-                return res.status(403).json({ message: "Not your item" })
+                return res.status(404).json({ message: "Not your item" })
 
             res.json({ message: "Updated" })
         }
     )
 })
 
-app.put("/items/edit/:id", requireLogin, (req, res, next) => {
+app.put("/items/edit/:id", requireLogin, (req, res) => {
 
-    const { category, type, title, description, location, date, contact } = req.body
+    let { category, type, title, description, location, date, contact } = req.body
+
+    category = sanitizeInput(category)
+    type = sanitizeInput(type)
+    title = sanitizeInput(title)
+    description = sanitizeInput(description)
+    location = sanitizeInput(location)
+    contact = sanitizeInput(contact)
 
     if (!validateFields([category, type, title, description, location, date, contact]))
         return res.status(400).json({ message: "All fields required" })
@@ -251,8 +256,6 @@ app.put("/items/edit/:id", requireLogin, (req, res, next) => {
         ],
         (err, result) => {
 
-            if (err) return next(err)
-
             if (result.affectedRows === 0)
                 return res.status(403).json({ message: "Not your item" })
 
@@ -261,14 +264,12 @@ app.put("/items/edit/:id", requireLogin, (req, res, next) => {
     )
 })
 
-app.delete("/items/:id", requireLogin, (req, res, next) => {
+app.delete("/items/:id", requireLogin, (req, res) => {
 
     db.query(
         "DELETE FROM items WHERE id=? AND user_id=?",
         [req.params.id, req.session.userId],
         (err, result) => {
-
-            if (err) return next(err)
 
             if (result.affectedRows === 0)
                 return res.status(403).json({ message: "Not your item" })
@@ -278,11 +279,7 @@ app.delete("/items/:id", requireLogin, (req, res, next) => {
     )
 })
 
-app.get("/", (req, res) => {
-    res.redirect("/home.html")
-})
-
-/* ================= ERROR HANDLING ================= */
+/* ================= ERRORS ================= */
 
 app.use((req, res) => {
     res.status(404).json({
