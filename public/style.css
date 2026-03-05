@@ -150,28 +150,3 @@ select option {
     align-items: stretch;
 }
 
-/* ===== MOBILE OPTIMIZATION ===== */
-
-@media (max-width:768px){
-
-.hero h1{
-font-size:36px;
-}
-
-.hero{
-padding:80px 20px;
-}
-
-.dashboard-card{
-margin-bottom:15px;
-}
-
-.item-card{
-margin-bottom:20px;
-}
-
-.navbar-brand span{
-font-size:16px;
-}
-
-}
