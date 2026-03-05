@@ -13,19 +13,6 @@ const totalClaimed = document.getElementById("totalClaimed")
 let isLoggedIn = false
 let username = null
 
-/* ================= XSS PROTECTION ================= */
-
-function escapeHTML(str) {
-    if (!str) return ""
-
-    return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;")
-}
-
 /* ================= LOGIN CHECK ================= */
 
 async function checkLogin() {
@@ -43,7 +30,7 @@ async function checkLogin() {
                         Add Item
                     </a>
                     <span class="me-2 fw-semibold">
-                        Welcome, ${escapeHTML(username)}
+                        Welcome, ${username}
                     </span>
                     <button class="btn btn-outline-danger btn-sm"
                         onclick="logout()">
@@ -114,14 +101,14 @@ async function loadItems() {
 
                         <div class="flex-grow-1">
 
-                            <h5 class="mb-3">${escapeHTML(item.title)}</h5>
+                            <h5 class="mb-3">${item.title}</h5>
 
-                            <p><strong>Category:</strong> ${escapeHTML(item.category)}</p>
-                            <p><strong>Type:</strong> ${escapeHTML(item.type)}</p>
-                            <p><strong>Description:</strong> ${escapeHTML(item.description)}</p>
-                            <p><strong>Location:</strong> ${escapeHTML(item.location)}</p>
-                            <p><strong>Date:</strong> ${escapeHTML(formattedDate)}</p>
-                            <p><strong>Contact:</strong> ${escapeHTML(item.contact)}</p>
+                            <p><strong>Category:</strong> ${item.category}</p>
+                            <p><strong>Type:</strong> ${item.type}</p>
+                            <p><strong>Description:</strong> ${item.description}</p>
+                            <p><strong>Location:</strong> ${item.location}</p>
+                            <p><strong>Date:</strong> ${formattedDate}</p>
+                            <p><strong>Contact:</strong> ${item.contact}</p>
 
                             <span class="badge ${
                                 item.status === "Claimed"
@@ -130,7 +117,7 @@ async function loadItems() {
                                     ? "bg-danger"
                                     : "bg-primary"
                             } mb-3">
-                                ${escapeHTML(item.status)}
+                                ${item.status}
                             </span>
 
                         </div>
